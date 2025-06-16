@@ -43,6 +43,7 @@ classifiers = [
 # you can list here all dependencies that are pip-instalable, and that have a name identical to the one used by conda (to allow reuse of this list in meta.yaml)
 # If conda name is different, please do not declare the pip name, and declare conda name in the next section
 dependencies = [
+  "numpy",
 ]
 
 [project.optional-dependencies]
@@ -72,7 +73,7 @@ channels = [
   "conda-forge"
 ]
 dependencies = [
-    "openalea.plantgl",
+  "numpy",
 ]
 
 [project.urls]
