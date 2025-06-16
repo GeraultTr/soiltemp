@@ -1,6 +1,6 @@
 {
   "template": "https://github.com/openalea-incubator/cookiecutter/",
-  "commit": "b02a366afa3947914530b592b0a2892d5d200fae",
+  "commit": "0dd073c0c5fc5cf69dee7c275f0f752aca5cf8e9",
   "checkout": null,
   "context": {
     "cookiecutter": {
@@ -16,7 +16,7 @@
         ".github/workflows/conda-package-build.yml"
       ],
       "_template": "https://github.com/openalea-incubator/cookiecutter/",
-      "_commit": "b02a366afa3947914530b592b0a2892d5d200fae"
+      "_commit": "0dd073c0c5fc5cf69dee7c275f0f752aca5cf8e9"
     }
   },
   "directory": null
