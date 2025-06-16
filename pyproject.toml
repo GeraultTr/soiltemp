@@ -83,4 +83,11 @@ Discussions = "https://github.com/openalea/soiltemp/discussions"
 Changelog = "https://github.com/openalea/soiltemp/releases"
 
 [project.entry-points."wralea"]
-"my_pkg" = "openalea.soiltemp_wralea"
+"ApsimCampbell" = "openalea.ApsimCampbell"
+"BiomaSurfacePartonSoilSWATHourlyPartonC" = "openalea.BiomaSurfacePartonSoilSWATHourlyPartonC"
+"BiomaSurfaceSWATSoilSWATC" = "openalea.BiomaSurfaceSWATSoilSWATC"
+"DSSAT_EPICST_standalone" = "openalea.DSSAT_EPICST_standalone"
+"DSSAT_ST_standalone" = "openalea.DSSAT_ST_standalone"
+"Monica_SoilTemp" = "openalea.Monica_SoilTemp"
+"Simplace_Soil_Temperature" = "openalea.Simplace_Soil_Temperature"
+"SQ_Soil_Temperature" = "openalea.SQ_Soil_Temperature"
