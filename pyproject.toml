@@ -11,6 +11,7 @@ where = ["src"]
 
 [tool.setuptools]
 include-package-data = false # force explicit declaration of data (disable automatic inclusion)
+license-files = ["LICEN[CS]E*"]
 
 # enable dynamic version based on git tags
 [tool.setuptools_scm]
@@ -22,9 +23,8 @@ authors = [
 ]
 description = "FSPM tools for OpenAlea"
 readme = "README.md"
-license = "CECILL-C"
-license-files = ["LICEN[CS]E*"]
-requires-python = ">=3.10"
+license = { text = "CECILL-C" }
+requires-python = ">=3.8"
 dynamic = ["version"]
 classifiers = [
   "Development Status :: 1 - Planning",
@@ -52,8 +52,8 @@ test = [
   "nbmake",
 ]
 dev = [
-  "pytest >=6",
-  "pytest-cov >=3",
+  "pytest",
+  "pytest-cov",
 ]
 doc = [
   "sphinx-autobuild",
