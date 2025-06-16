@@ -23,7 +23,7 @@ class Model:
 
 #######################################################################################
 # APSIM Campbell
-from Campbell.campbell import init_campbell, model_campbell
+from openalea.ApsimCampbell.soiltemperature import init_soiltemperature, model_soiltemperature
 
 class APSIM_Campbell(Model):
     """ APSIM implementation of the Cambell model.
@@ -276,7 +276,7 @@ class APSIM_Campbell(Model):
 # DSSAT EPIC ST
 # TODO Debug : only 3 layers are different
 
-from DSSAT_EPICST_standalone import stemp_epic
+from openalea.DSSAT_EPICST_standalone import stemp_epic
 
 class DSSAT_EPIC(Model):
     # TODO : Write the wmapping explicitly
@@ -433,7 +433,7 @@ class DSSAT_EPIC(Model):
 # DSSAT
 
 #######################################################################################
-from DSSAT_ST_standalone import stemp
+from openalea.DSSAT_ST_standalone import stemp
 
 class DSSAT_ST(Model):
 
@@ -598,9 +598,9 @@ class DSSAT_ST(Model):
 # Simplace
 
 #######################################################################################
-from Simplace_Soil_Temperature.SoilTemperatureComponent import model_soiltemperature as simplace_model
-from Simplace_Soil_Temperature.snowcovercalculator import init_snowcovercalculator as simplace_init_snow
-from Simplace_Soil_Temperature.stmpsimcalculator import init_stmpsimcalculator as simplace_init_stmp
+from openalea.Simplace_Soil_Temperature.SoilTemperatureComponent import model_soiltemperature as simplace_model
+from openalea.Simplace_Soil_Temperature.snowcovercalculator import init_snowcovercalculator as simplace_init_snow
+from openalea.Simplace_Soil_Temperature.stmpsimcalculator import init_stmpsimcalculator as simplace_init_stmp
 
 
 class SIMPLACE_APEX(Model):
@@ -822,12 +822,12 @@ class SIMPLACE_APEX(Model):
 
 #######################################################################################
 
-from BiomaSurfacePartonSoilSWATC.SurfacePartonSoilSWATCComponent import (
-        model_surfacepartonsoilswatc, 
+from openalea.BiomaSurfacePartonSoilSWATHourlyPartonC.SurfacePartonSoilSWATHourlyPartonCComponent import (
+        model_surfacepartonsoilswathourlypartonc, 
         model_surfacetemperatureparton, 
         model_soiltemperatureswat as model_global_parton
 )
-from BiomaSurfacePartonSoilSWATC.soiltemperatureswat import init_soiltemperatureswat as init_parton
+from openalea.BiomaSurfacePartonSoilSWATHourlyPartonC.soiltemperatureswat import init_soiltemperatureswat as init_parton
 
 class BioMA_Parton_SWAT(Model):
     """ BioMa implementation of the Parton SWAT model.
@@ -973,11 +973,11 @@ class BioMA_Parton_SWAT(Model):
 
 #######################################################################################
 
-from BiomaSurfaceSWATSoilSWATC.SurfaceSWATSoilSWATCComponent import (
+from openalea.BiomaSurfaceSWATSoilSWATC.SurfaceSWATSoilSWATCComponent import (
         model_surfacetemperatureswat as model_surface_swat, 
         model_soiltemperatureswat as model_soil_temperature_swat, 
     )
-from BiomaSurfaceSWATSoilSWATC.soiltemperatureswat import init_soiltemperatureswat as init_swat
+from openalea.BiomaSurfaceSWATSoilSWATC.soiltemperatureswat import init_soiltemperatureswat as init_swat
 
 class BioMA_SWAT(Model):
     """ BioMa implementation of the SWAT model.
@@ -1126,13 +1126,13 @@ class BioMA_SWAT(Model):
 
 
 #######################################################################################
-from Monica_SoilTemp.soiltemperature import (
+from openalea.Monica_SoilTemp.soiltemperature import (
     model_soiltemperature as monica_model_soiltemperature,
     init_soiltemperature as monica_init)
-from Monica_SoilTemp.nosnowsoilsurfacetemperature import (
+from openalea.Monica_SoilTemp.nosnowsoilsurfacetemperature import (
     model_nosnowsoilsurfacetemperature as monica_model_nosnowsoilsurfacetemperature
 )
-from Monica_SoilTemp.withsnowsoilsurfacetemperature import (
+from openalea.Monica_SoilTemp.withsnowsoilsurfacetemperature import (
     model_withsnowsoilsurfacetemperature as monica_model_withsnowsoilsurfacetemperature
 )
 
@@ -1347,8 +1347,8 @@ class MONICA(Model):
 
 
 #######################################################################################
-from SQ_Soil_Temperature.calculatesoiltemperature import model_calculatesoiltemperature as sq_soil_temperature, init_calculatesoiltemperature as init_sq
-from SQ_Soil_Temperature.calculatehourlysoiltemperature import model_calculatehourlysoiltemperature as sq_hourly_soil_temperature
+from openalea.SQ_Soil_Temperature.calculatesoiltemperature import model_calculatesoiltemperature as sq_soil_temperature, init_calculatesoiltemperature as init_sq
+from openalea.SQ_Soil_Temperature.calculatehourlysoiltemperature import model_calculatehourlysoiltemperature as sq_hourly_soil_temperature
 
 class SiriusQuality(Model):
     """ SiiriusQuality implementation of the soil temperature model."""
@@ -1489,12 +1489,12 @@ class SiriusQuality(Model):
         return df
 
 #######################################################################################
-from Stics_soil_temperature.temp_amp import model_temp_amp as stics_model_temp_amp
-from Stics_soil_temperature.temp_profile import model_temp_profile as stics_model_temp_profile
-from Stics_soil_temperature.layers_temp import model_layers_temp as stics_model_layers_temp
-from Stics_soil_temperature.canopy_temp_avg import model_canopy_temp_avg as stics_model_canopy_temp_avg
-from Stics_soil_temperature.update import model_update as stics_model_update
-from Stics_soil_temperature.temp_profile import init_temp_profile as stics_init_fun
+from openalea.Stics_soil_temperature.temp_amp import model_temp_amp as stics_model_temp_amp
+from openalea.Stics_soil_temperature.temp_profile import model_temp_profile as stics_model_temp_profile
+from openalea.Stics_soil_temperature.layers_temp import model_layers_temp as stics_model_layers_temp
+from openalea.Stics_soil_temperature.canopy_temp_avg import model_canopy_temp_avg as stics_model_canopy_temp_avg
+from openalea.Stics_soil_temperature.update import model_update as stics_model_update
+from openalea.Stics_soil_temperature.temp_profile import init_temp_profile as stics_init_fun
 
 
 class STICS(Model):
