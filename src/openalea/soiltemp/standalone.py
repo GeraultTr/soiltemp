@@ -117,7 +117,7 @@ class Treatment:
 
 
 #Read all the weather daily values from file
-def read_treatments(fn="InputData/Treatment.txt"):
+def read_treatments():
     fn = data.data_dir/'Treatment.txt'
     trt_df = pd.read_csv(fn, sep='\t', header=2)
 
