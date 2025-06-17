@@ -823,7 +823,7 @@ class SIMPLACE_APEX(Model):
 #######################################################################################
 
 from openalea.BiomaSurfacePartonSoilSWATHourlyPartonC.SurfacePartonSoilSWATHourlyPartonCComponent import (
-        model_surfacepartonsoilswathourlypartonc, 
+        model_surfacepartonsoilswathourlypartonc as model_surfacepartonsoilswatc, 
         model_surfacetemperatureparton, 
         model_soiltemperatureswat as model_global_parton
 )
@@ -1489,6 +1489,7 @@ class SiriusQuality(Model):
         return df
 
 #######################################################################################
+"""
 from openalea.Stics_soil_temperature.temp_amp import model_temp_amp as stics_model_temp_amp
 from openalea.Stics_soil_temperature.temp_profile import model_temp_profile as stics_model_temp_profile
 from openalea.Stics_soil_temperature.layers_temp import model_layers_temp as stics_model_layers_temp
@@ -1594,7 +1595,7 @@ class STICS(Model):
         
         return df
 
-
+"""
 
 """
 # ICASA

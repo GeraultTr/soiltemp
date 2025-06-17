@@ -7,8 +7,9 @@ __revision__ = "  "
 
 from openalea.core import Factory as Fa
 
-__name__ = "amei.soil temperature"
+__name__ = "amei.soil_temperature"
 
+__editable__ = True
 __version__ = '0.0.1'
 __license__ = "Cecill-C"
 __authors__ = 'AMEI Consortium'
