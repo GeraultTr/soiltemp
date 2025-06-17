@@ -11,7 +11,7 @@ Standalone wrapper around soil temperature models
 import pandas as pd
 from collections import OrderedDict 
 
-from Campbell.campbell import init_campbell, model_campbell
+#from Campbell.campbell import init_campbell, model_campbell
 
 
 #Weather arrays

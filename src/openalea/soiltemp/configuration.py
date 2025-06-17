@@ -17,8 +17,8 @@ __license__ = "Cecill-C"
 __revision__ = " $Id$ "
 
 from openalea.core import Node, ISequence, IEnumStr, IInt
-import standalone
-import model
+from openalea.soiltemp import standalone
+from openalea.soiltemp import model
 
 class Configuration(Node):
     """
