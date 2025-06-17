@@ -11,6 +11,7 @@ Standalone wrapper around soil temperature models
 import pandas as pd
 from collections import OrderedDict 
 
+from openalea.soiltemp import data
 #from Campbell.campbell import init_campbell, model_campbell
 
 
@@ -41,8 +42,12 @@ from collections import OrderedDict
 # Treatment is one of SOIL_ID, WST_ID, AWC, LAID
 SOIL_IDs = ['SICL', 'SILO', 'SALO', 'SAND']
 WST_IDs = ['USGA', 'DEMU', 'COCA', 'FRLU', 'USMA', 'FRMO', 'CAQC']
+WST_IDs = ['FRMO']
+
 AWCs = [0.0, 0.25, 0.5, 0.75, 1.0]
+AWCs = [0.0]
 LAIDs = [0, 2, 7]
+LAIDs = [0]
 
 class OneTreatment:
     def __init__(self, trt, 
@@ -78,7 +83,9 @@ class OneTreatment:
 
 class Treatment:
 
-    def __init__(self, fn = "./InputData/Treatment.txt"):
+    def __init__(self):
+        fn = data.data_dir/'Treatment.txt'
+
         self.trt_df = pd.read_csv(fn, sep='\t', header=2)
         self.weather_metadata = read_weather_metadata()
         self.soil_metadata = read_soil_metadata()
@@ -111,6 +118,7 @@ class Treatment:
 
 #Read all the weather daily values from file
 def read_treatments(fn="InputData/Treatment.txt"):
+    fn = data.data_dir/'Treatment.txt'
     trt_df = pd.read_csv(fn, sep='\t', header=2)
 
     return trt_df
@@ -129,6 +137,7 @@ def read_one_treatment(trt_df, soil=SOIL_IDs[0], weather_station=WST_IDs[0], wat
     LAI = LAI
     soilID = soil
 
+    weather_fn = data.data_dir/'WeatherData'/f'{WST_DATASET}.WTH'
     weather_fn = f'InputData/WeatherData/{WST_DATASET}.WTH'
     weather = read_weather(weather_fn)
     soil_df = read_soil_layers()
@@ -142,7 +151,8 @@ def read_one_treatment(trt_df, soil=SOIL_IDs[0], weather_station=WST_IDs[0], wat
 
     return weather, my_soil, AWC, LAI, irrig, surfOrgResidue, aboveGroundDM, mulch
 
-def read_soil_metadata(fn="InputData/SoilMetadata.txt"):
+def read_soil_metadata():
+    fn = data.data_dir/'SoilMetadata.txt'
     wmd_df = pd.read_csv(fn, sep='\t', header=2)
     return wmd_df
 
