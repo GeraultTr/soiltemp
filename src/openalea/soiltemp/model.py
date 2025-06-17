@@ -1480,8 +1480,9 @@ class MONICA(Model):
         
         # init
         data_init = monica_init(
-            noOfTempLayers,
             noOfSoilLayers,
+            noOfTempLayers,
+            noOfTempLayersPlus1,
             timeStep,
             soilMoistureConst,
             baseTemp,
