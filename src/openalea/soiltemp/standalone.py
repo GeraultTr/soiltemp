@@ -130,24 +130,24 @@ def read_one_treatment(trt_df, soil=SOIL_IDs[0], weather_station=WST_IDs[0], wat
     mask4 = trt_df.LAID==LAI
     record = trt_df[mask1 & mask2 & mask3 & mask4]
 
-    _, data = next(record.iterrows())
+    _, _data = next(record.iterrows())
 
-    WST_DATASET = data.WST_DATASET
+    WST_DATASET = _data.WST_DATASET
     AWC = water_content
     LAI = LAI
     soilID = soil
 
+    #weather_fn = f'InputData/WeatherData/{WST_DATASET}.WTH'
     weather_fn = data.data_dir/'WeatherData'/f'{WST_DATASET}.WTH'
-    weather_fn = f'InputData/WeatherData/{WST_DATASET}.WTH'
     weather = read_weather(weather_fn)
     soil_df = read_soil_layers()
     mask = soil_df.SOIL_ID==soilID
     my_soil = soil_df[mask]
 
-    irrig = IRVAL = data.IRVAL # irrigation
-    surfOrgResidue = data['LC0D'] # Surface organic residue, dry mass
-    aboveGroundDM = CWAD = data.CWAD #Total above ground dry mass
-    mulch = MLTHK = data.MLTHK
+    irrig = IRVAL = _data.IRVAL # irrigation
+    surfOrgResidue = _data['LC0D'] # Surface organic residue, dry mass
+    aboveGroundDM = CWAD = _data.CWAD #Total above ground dry mass
+    mulch = MLTHK = _data.MLTHK
 
     return weather, my_soil, AWC, LAI, irrig, surfOrgResidue, aboveGroundDM, mulch
 
@@ -157,17 +157,21 @@ def read_soil_metadata():
     return wmd_df
 
 
-def read_weather(fn="InputData/WeatherData/USGAL2AW0.50.WTH"):
+def read_weather(fn=None):
+    if fn is None:
+        fn = data.data_dir/'WeatherData'/'FRMOL0AW0.00.WTH'
     weather_df = pd.read_csv(fn, sep='\t')
     weather_df.DATE = pd.to_datetime(weather_df.DATE, format="%Y%j")
 
     return weather_df
 
-def read_weather_metadata(fn="InputData/WeatherMetadata.txt"):
+def read_weather_metadata():
+    fn = data.data_dir/'WeatherMetadata.txt'
     wmd_df = pd.read_csv(fn, sep='\t', header=2)
     return wmd_df
 
-def read_soil_layers(fn="InputData/SoilData.txt"):
+def read_soil_layers():
+    fn = data.data_dir/'SoilData.txt'
     soil = pd.read_csv(fn, sep='\t', header=2)
 
     # Convert units
