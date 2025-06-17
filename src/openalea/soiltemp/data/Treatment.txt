@@ -1,0 +1,7 @@
+projectID	Simulation ID	Treatment ID	Soil ID	Weather station ID	weather_file	Leaf area index	Plant available water content	Irrigation amount	Surface organic residue, dry mass	Total above ground dry mass	Mulch thickness 
+text	text	text	text	text	text	m²/m²	-	mm	kg[C]/ha	kg[DM]/ha	mm
+ProjectID	SM	TREAT_ID	SOIL_ID	WST_ID	WST_DATASET	LAID	AWC	IRVAL	LC0D	CWAD	MLTHK
+FRMOL0AW0.00	SICL_FRMO_L0AW0.00	L0AW0.00	SICL	FRMO	FRMOL0AW0.00	0	0.00	0	0	0	0
+FRMOL0AW0.00	SILO_FRMO_L0AW0.00	L0AW0.00	SILO	FRMO	FRMOL0AW0.00	0	0.00	0	0	0	0
+FRMOL0AW0.00	SALO_FRMO_L0AW0.00	L0AW0.00	SALO	FRMO	FRMOL0AW0.00	0	0.00	0	0	0	0
+FRMOL0AW0.00	SAND_FRMO_L0AW0.00	L0AW0.00	SAND	FRMO	FRMOL0AW0.00	0	0.00	0	0	0	0
