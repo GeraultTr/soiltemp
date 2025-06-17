@@ -5,12 +5,16 @@ from math import *
 from typing import *
 from datetime import datetime
 
-from .snowcovercalculator import model_snowcovercalculator
-from .stmpsimcalculator import model_stmpsimcalculator
+from Simplace_Soil_Temperature.snowcovercalculator import model_snowcovercalculator, init_snowcovercalculator
+from Simplace_Soil_Temperature.stmpsimcalculator import model_stmpsimcalculator, init_stmpsimcalculator
 
 #%%CyML Model Begin%%
 def model_soiltemperature(cCarbonContent:float,
          cAlbedo:float,
+         cInitialAgeOfSnow:int,
+         cInitialSnowWaterContent:float,
+         cSnowIsolationFactorA:float,
+         cSnowIsolationFactorB:float,
          iAirTemperatureMax:float,
          iAirTemperatureMin:float,
          iGlobalSolarRadiation:float,
@@ -58,6 +62,42 @@ def model_soiltemperature(cCarbonContent:float,
                                ** max : 1.0
                                ** min : 0.0
                                ** default : 
+                               ** unit : http://www.wurvoc.org/vocabularies/om-1.8/one
+                 * name: cInitialAgeOfSnow
+                               ** description : Initial age of snow
+                               ** inputtype : parameter
+                               ** parametercategory : constant
+                               ** datatype : INT
+                               ** max : 
+                               ** min : 0
+                               ** default : 0
+                               ** unit : http://www.wurvoc.org/vocabularies/om-1.8/percent
+                 * name: cInitialSnowWaterContent
+                               ** description : Initial snow water content
+                               ** inputtype : parameter
+                               ** parametercategory : constant
+                               ** datatype : DOUBLE
+                               ** max : 1500.0
+                               ** min : 0.0
+                               ** default : 0.0
+                               ** unit : http://www.wurvoc.org/vocabularies/om-1.8/percent
+                 * name: cSnowIsolationFactorA
+                               ** description : Static part of the snow isolation index calculation
+                               ** inputtype : parameter
+                               ** parametercategory : constant
+                               ** datatype : DOUBLE
+                               ** max : 10.0
+                               ** min : 0.0
+                               ** default : 2.3
+                               ** unit : http://www.wurvoc.org/vocabularies/om-1.8/one
+                 * name: cSnowIsolationFactorB
+                               ** description : Dynamic part of the snow isolation index calculation
+                               ** inputtype : parameter
+                               ** parametercategory : constant
+                               ** datatype : DOUBLE
+                               ** max : 1.0
+                               ** min : 0.0
+                               ** default : 0.22
                                ** unit : http://www.wurvoc.org/vocabularies/om-1.8/one
                  * name: iAirTemperatureMax
                                ** description : Daily maximum air temperature
@@ -125,7 +165,7 @@ def model_soiltemperature(cCarbonContent:float,
                  * name: SoilTempArray
                                ** description : Soil Temp array of last day
                                ** inputtype : variable
-                               ** variablecategory : exogenous
+                               ** variablecategory : auxiliary
                                ** datatype : DOUBLEARRAY
                                ** len : 
                                ** max : 35.0
@@ -311,11 +351,7 @@ def model_soiltemperature(cCarbonContent:float,
                                ** unit : http://www.wurvoc.org/vocabularies/om-1.8/degree_Celsius_per_day
     """
 
-    cInitialAgeOfSnow:int
-    cInitialSnowWaterContent:float
     Albedo:float
-    cSnowIsolationFactorA:float
-    cSnowIsolationFactorB:float
     iTempMax:float
     iTempMin:float
     iRadiation:float
@@ -339,3 +375,35 @@ def model_soiltemperature(cCarbonContent:float,
     (SoilTempArray, rSoilTempArrayRate) = model_stmpsimcalculator(cSoilLayerDepth, cFirstDayMeanTemp, cAVT, cABD, cDampingDepth, iSoilWaterContent, iSoilSurfaceTemperature, SoilTempArray, rSoilTempArrayRate, pSoilLayerDepth)
     return (SoilSurfaceTemperature, SnowIsolationIndex, SnowWaterContent, rSnowWaterContentRate, rSoilSurfaceTemperatureRate, rAgeOfSnowRate, AgeOfSnow, SoilTempArray, rSoilTempArrayRate)
 #%%CyML Model End%%
+
+#%%CyML Init Begin%%
+def init_soiltemperature(cCarbonContent:float,
+         cInitialAgeOfSnow:int,
+         cInitialSnowWaterContent:float,
+         Albedo:float,
+         cSnowIsolationFactorA:float,
+         cSnowIsolationFactorB:float,
+         iTempMax:float,
+         iTempMin:float,
+         iRadiation:float,
+         iRAIN:float,
+         iCropResidues:float,
+         iPotentialSoilEvaporation:float,
+         iLeafAreaIndex:float,
+         cSoilLayerDepth:'Array[float]',
+         cFirstDayMeanTemp:float,
+         cAVT:float,
+         cABD:float,
+         cDampingDepth:float,
+         iSoilWaterContent:float):
+    SoilTempArray:'array[float]'
+    pInternalAlbedo:float
+    SnowWaterContent:float
+    SoilSurfaceTemperature:float
+    AgeOfSnow:int
+    rSoilTempArrayRate:'array[float]'
+    pSoilLayerDepth:'array[float]'
+    (pInternalAlbedo, SnowWaterContent, SoilSurfaceTemperature, AgeOfSnow) = init_snowcovercalculator(cCarbonContent, cInitialAgeOfSnow, cInitialSnowWaterContent, Albedo, cSnowIsolationFactorA, cSnowIsolationFactorB, iTempMax, iTempMin, iRadiation, iRAIN, iCropResidues, iPotentialSoilEvaporation, iLeafAreaIndex)
+    (SoilTempArray, rSoilTempArrayRate, pSoilLayerDepth) = init_stmpsimcalculator(cSoilLayerDepth, cFirstDayMeanTemp, cAVT, cABD, cDampingDepth, iSoilWaterContent)
+    return (pInternalAlbedo, SnowWaterContent, SoilSurfaceTemperature, AgeOfSnow, SoilTempArray, rSoilTempArrayRate, pSoilLayerDepth)
+#%%CyML Init End%%
