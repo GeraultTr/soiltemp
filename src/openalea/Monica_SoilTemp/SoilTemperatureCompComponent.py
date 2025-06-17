@@ -5,9 +5,9 @@ from math import *
 from typing import *
 from datetime import datetime
 
-from .soiltemperature import model_soiltemperature
-from .nosnowsoilsurfacetemperature import model_nosnowsoilsurfacetemperature
-from .withsnowsoilsurfacetemperature import model_withsnowsoilsurfacetemperature
+from Monica_SoilTemp.soiltemperature import model_soiltemperature
+from Monica_SoilTemp.nosnowsoilsurfacetemperature import model_nosnowsoilsurfacetemperature
+from Monica_SoilTemp.withsnowsoilsurfacetemperature import model_withsnowsoilsurfacetemperature
 
 #%%CyML Model Begin%%
 def model_soiltemperaturecomp(tmin:float,
