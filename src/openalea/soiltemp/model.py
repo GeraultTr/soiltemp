@@ -14,6 +14,9 @@ class Model:
     def init(self, config):
         pass
 
+    def step(self, *args, **kwargs):
+        pass
+
     def run(self, config, nb_steps=0):
         pass
 
@@ -23,7 +26,7 @@ class Model:
 
 #######################################################################################
 # APSIM Campbell
-from openalea.ApsimCampbell.soiltemperature import init_soiltemperature, model_soiltemperature
+from openalea.ApsimCampbell.soiltemperature import init_soiltemperature as apsim_init, model_soiltemperature as apsim_model
 
 class APSIM_Campbell(Model):
     """ APSIM implementation of the Cambell model.
@@ -44,6 +47,18 @@ class APSIM_Campbell(Model):
         boundaryLayerConductanceSource:str = 'calc'
         netRadiationSource:str = 'calc'
         windSpeed:float = 3.0
+
+        STEFAN_BOLTZMANNconst:float = 0.0000000567
+        AIRnode = 0
+        SURFACEnode = 1
+        TOPSOILnode = 2
+        NUM_PHANTOM_NODES = 5
+        soilRoughnessHeight = 0.057
+        pom:float = 1.3
+        
+        # New variables
+        ps = 2.63
+        timestep = 24.0 * 60.0 * 60.0
 
         # variable
         soil_water = soil.SLLL + c.AWC * (soil.SLDUL - soil.SLLL)
@@ -90,8 +105,61 @@ class APSIM_Campbell(Model):
         WeatherRecord = dataclasses.make_dataclass('WeatherRecord',list(config.weather.columns) )
         wi = WeatherRecord(**_wi) 
 
+
         # init
-        data_init = init_campbell(
+        data_init = apsim_init(
+            weather_MinT=wi.TMIN,
+            weather_MaxT=wi.TMAX,
+            weather_MeanT=wi.T2M,
+            weather_Tav=c.TAV,
+            weather_Amp=c.TAMP,
+            weather_AirPressure=airPressure,
+            weather_Wind=windSpeed,
+            weather_Latitude=c.XLAT,
+            weather_Radn=wi.SRAD,
+            clock_Today_DayOfYear=wi.DATE.dayofyear,
+            microClimate_CanopyHeight=canopyHeight,
+            physical_Thickness=THICK,
+            physical_BD=BD,
+            ps=ps,
+            physical_Rocks=SLROCK,
+            physical_ParticleSizeSand=SLSAND,
+            physical_ParticleSizeSilt=SLSILT,
+            physical_ParticleSizeClay=CLAY,
+            organic_Carbon=SLCARB, # TODO
+            waterBalance_SW=SW,
+            waterBalance_Eos=0,# TODO
+            waterBalance_Eo=0, # TODO
+            waterBalance_Es=ES, # TODO
+            waterBalance_Salb=c.albedo,
+            pInitialValues=[], # TODO
+            DepthToConstantTemperature=CONSTANT_TEMPdepth,
+            timestep=timestep,
+            latentHeatOfVapourisation:float,
+            stefanBoltzmannConstant=STEFAN_BOLTZMANNconst,
+            airNode=AIRnode,
+            surfaceNode=SURFACEnode,
+            topsoilNode=TOPSOILnode,
+            numPhantomNodes=NUM_PHANTOM_NODES,
+            constantBoundaryLayerConductance:float,
+            numIterationsForBoundaryLayerConductance:int,
+            defaultTimeOfMaximumTemperature:float,
+            defaultInstrumentHeight:float,
+            bareSoilRoughness:float,
+            nodeDepth:'Array[float]',
+            thermCondPar1:'Array[float]',
+            thermCondPar2:'Array[float]',
+            thermCondPar3:'Array[float]',
+            thermCondPar4:'Array[float]',
+            pom=pom,
+            soilRoughnessHeight=soilRoughnessHeight,
+            nu=0.6, #TODO
+            boundarLayerConductanceSource=boundaryLayerConductanceSource,
+            netRadiationSource=netRadiationSource,
+            MissingValue=0, #TODO
+            soilConstituentNames= ["Rocks", "OrganicMatter", "Sand", "Silt", "Clay", "Water", "Ice", "Air"] # TODO
+            )
+            """
             NLAYR=c.nb_layers,
             CONSTANT_TEMPdepth=CONSTANT_TEMPdepth, 
             T2M=wi.T2M, #
@@ -120,7 +188,8 @@ class APSIM_Campbell(Model):
             airPressure=airPressure, 
             boundaryLayerConductanceSource=boundaryLayerConductanceSource,
             netRadiationSource=netRadiationSource, 
-            windSpeed=windSpeed)        
+            windSpeed=windSpeed)    
+            """    
         
         (thickness, 
         depth, 
@@ -185,7 +254,7 @@ class APSIM_Campbell(Model):
             rocks, 
             carbon, 
             sand, 
-            silt) = model_campbell(
+            silt) = apsim_model(
                 # idem from init
                 NLAYR=c.nb_layers,
                 CONSTANT_TEMPdepth=CONSTANT_TEMPdepth, 
