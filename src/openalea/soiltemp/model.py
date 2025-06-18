@@ -3,6 +3,8 @@ from collections import OrderedDict
 import dataclasses 
 import math
 import numpy as np
+from array import array
+
 
 # CONSTANT
 digit = 6
@@ -59,7 +61,20 @@ class APSIM_Campbell(Model):
         # New variables
         ps = 2.63
         timestep = 24.0 * 60.0 * 60.0
-
+        latentHeatOfVapourisation=2.465e6
+        constantBoundaryLayerConductance = 20.
+        numIterationsForBoundaryLayerConductance = 1
+        defaultTimeOfMaximumTemperature = 14.0
+        defaultInstrumentHeight = 1.2
+        bareSoilRoughness = 57
+        thermCondPar1=None
+        thermCondPar2=None
+        thermCondPar3=None
+        thermCondPar4=None
+        nu = 0.6
+        MissingValue = 999999
+        soilConstituentNames= ["Rocks", "OrganicMatter", "Sand", "Silt", "Clay", "Water", "Ice", "Air"]
+        
         # variable
         soil_water = soil.SLLL + c.AWC * (soil.SLDUL - soil.SLLL)
 
@@ -89,17 +104,25 @@ class APSIM_Campbell(Model):
         soil['SLSAND'] = sand
         soil['SLSILT'] = silt
 
+        def to_array(l):
+            """ Convert a list to an array, or return the array if already one """
+            if isinstance(l, array):
+                return l
+            else:
+                return array('f', l.tolist())
 
-        SLLT = soil.SLLT.tolist()
-        SLLB = soil.SLLB.tolist()
-        THICK=soil.THICK.tolist()
-        BD=soil.SLBDM.tolist()
-        SLCARB=soil.SLOC.tolist() 
-        CLAY=soil.SLCLY.tolist()
-        SLROCK=soil.SLROCK.tolist() 
-        SLSILT=soil.SLSILT.tolist() 
-        SLSAND=soil.SLSAND.tolist()
-        SW=soil_water.tolist()
+        SLLT = to_array(soil.SLLT)
+        SLLB = to_array(soil.SLLB)
+        THICK=to_array(soil.THICK)
+        BD=to_array(soil.SLBDM)
+        SLCARB=to_array(soil.SLOC) 
+        CLAY=to_array(soil.SLCLY)
+        SLROCK=to_array(soil.SLROCK) 
+        SLSILT=to_array(soil.SLSILT) 
+        SLSAND=to_array(soil.SLSAND)
+        SLOC = to_array(soil.SLOC) # Organic Carbon
+
+        SW=to_array(soil_water)
 
         _wi = dict(config.weather.iloc[0])
         WeatherRecord = dataclasses.make_dataclass('WeatherRecord',list(config.weather.columns) )
@@ -126,40 +149,41 @@ class APSIM_Campbell(Model):
             physical_ParticleSizeSand=SLSAND,
             physical_ParticleSizeSilt=SLSILT,
             physical_ParticleSizeClay=CLAY,
-            organic_Carbon=SLCARB, # TODO
+            organic_Carbon=SLOC,
             waterBalance_SW=SW,
-            waterBalance_Eos=0,# TODO
-            waterBalance_Eo=0, # TODO
+
+            waterBalance_Eos=wi.EOAD,# Daily Potential Evapotranspiration
+            waterBalance_Eo=wi.EOAD, 
             waterBalance_Es=ES, # TODO
             waterBalance_Salb=c.albedo,
-            pInitialValues=[], # TODO
+            pInitialValues=None, 
             DepthToConstantTemperature=CONSTANT_TEMPdepth,
             timestep=timestep,
-            latentHeatOfVapourisation:float,
+            latentHeatOfVapourisation=latentHeatOfVapourisation,
             stefanBoltzmannConstant=STEFAN_BOLTZMANNconst,
             airNode=AIRnode,
             surfaceNode=SURFACEnode,
             topsoilNode=TOPSOILnode,
             numPhantomNodes=NUM_PHANTOM_NODES,
-            constantBoundaryLayerConductance:float,
-            numIterationsForBoundaryLayerConductance:int,
-            defaultTimeOfMaximumTemperature:float,
-            defaultInstrumentHeight:float,
-            bareSoilRoughness:float,
-            nodeDepth:'Array[float]',
-            thermCondPar1:'Array[float]',
-            thermCondPar2:'Array[float]',
-            thermCondPar3:'Array[float]',
-            thermCondPar4:'Array[float]',
+            constantBoundaryLayerConductance=constantBoundaryLayerConductance,
+            numIterationsForBoundaryLayerConductance=numIterationsForBoundaryLayerConductance,
+            defaultTimeOfMaximumTemperature=defaultTimeOfMaximumTemperature,
+            defaultInstrumentHeight=defaultInstrumentHeight,
+            bareSoilRoughness=bareSoilRoughness,
+            nodeDepth=None,
+            thermCondPar1=thermCondPar1,
+            thermCondPar2=thermCondPar2,
+            thermCondPar3=thermCondPar3,
+            thermCondPar4=thermCondPar4,
             pom=pom,
             soilRoughnessHeight=soilRoughnessHeight,
-            nu=0.6, #TODO
+            nu=nu,
             boundarLayerConductanceSource=boundaryLayerConductanceSource,
             netRadiationSource=netRadiationSource,
-            MissingValue=0, #TODO
-            soilConstituentNames= ["Rocks", "OrganicMatter", "Sand", "Silt", "Clay", "Water", "Ice", "Air"] # TODO
+            MissingValue=MissingValue, #TODO
+            soilConstituentNames= soilConstituentNames,
             )
-            """
+        """
             NLAYR=c.nb_layers,
             CONSTANT_TEMPdepth=CONSTANT_TEMPdepth, 
             T2M=wi.T2M, #
@@ -189,26 +213,33 @@ class APSIM_Campbell(Model):
             boundaryLayerConductanceSource=boundaryLayerConductanceSource,
             netRadiationSource=netRadiationSource, 
             windSpeed=windSpeed)    
-            """    
-        
-        (thickness, 
-        depth, 
-        bulkDensity, 
-        clay, 
-        soilWater, 
-        soilTemp, 
-        newTemperature, 
-        minSoilTemp, 
-        maxSoilTemp, 
-        aveSoilTemp, 
-        morningSoilTemp,
-        thermalCondPar1, thermalCondPar2, thermalCondPar3, thermalCondPar4, 
-        thermalConductivity, thermalConductance, 
-        heatStorage, volSpecHeatSoil, 
-        maxTempYesterday,
-        minTempYesterday, 
-        carbon, rocks, silt, sand, 
-        boundaryLayerConductance) = data_init
+        """    
+        (InitialValues, 
+         doInitialisationStuff, 
+         internalTimeStep, 
+         timeOfDaySecs, 
+         numNodes, 
+         numLayers, 
+         nodeDepth, 
+         thermCondPar1, 
+         thermCondPar2, 
+         thermCondPar3, 
+         thermCondPar4, 
+         volSpecHeatSoil, 
+         soilTemp, 
+         morningSoilTemp, 
+         heatStorage, 
+         thermalConductance, 
+         thermalConductivity, 
+         boundaryLayerConductance, 
+         newTemperature, airTemperature, 
+         maxTempYesterday, minTempYesterday, 
+         soilWater, minSoilTemp, maxSoilTemp, aveSoilTemp, 
+         aveSoilWater, thickness, bulkDensity, 
+         rocks, carbon, sand, silt, clay, 
+         soilRoughnessHeight, instrumentHeight, 
+         netRadiation, canopyHeight, instrumHeight)= data_init
+
 
 
 
@@ -233,91 +264,114 @@ class APSIM_Campbell(Model):
             wi = WeatherRecord(**_wi) 
 
             # Call the model
-            (soilTemp, 
-            minSoilTemp, 
-            maxSoilTemp, 
-            aveSoilTemp,
-            morningSoilTemp, 
-            newTemperature, 
-            maxTempYesterday, 
-            minTempYesterday, 
-            thermalCondPar1, thermalCondPar2, thermalCondPar3, thermalCondPar4, 
-            thermalConductivity, thermalConductance, 
-            heatStorage, 
-            volSpecHeatSoil, 
-            boundaryLayerConductance, 
-            thickness, 
-            depth, 
-            bulkDensity, 
-            soilWater, 
-            clay,
-            rocks, 
-            carbon, 
-            sand, 
-            silt) = apsim_model(
-                # idem from init
-                NLAYR=c.nb_layers,
-                CONSTANT_TEMPdepth=CONSTANT_TEMPdepth, 
-                T2M=wi.T2M, 
-                TMAX=wi.TMAX, 
-                TMIN=wi.TMIN,
-                TAV=c.TAV, 
-                TAMP=c.TAMP, 
-                XLAT=c.XLAT,
-                DOY=wi.DATE.dayofyear,
-                canopyHeight=canopyHeight, 
-                SALB=c.albedo,
-                SRAD=wi.SRAD, 
-                ESP=wi.ESP, 
-                ES=ES, 
-                EOAD=wi.EOAD,
-                instrumentHeight=instrumentHeight,
 
-                # soil
-                THICK=THICK, 
-                BD=BD, 
-                SLCARB=SLCARB, 
-                CLAY=CLAY, 
-                SLROCK=SLROCK, 
-                SLSILT=SLSILT, 
-                SLSAND=SLSAND,
-                SW=SW,     
-
-                # APSIM soil internal variable 
-                THICKApsim=thickness, 
-                BDApsim=bulkDensity, 
-                CLAYApsim=clay, 
-                SLROCKApsim=rocks, 
-                SLSILTApsim=silt, 
-                SLSANDApsim=sand, 
-                SWApsim=soilWater,
-                DEPTHApsim =depth, 
-                SLCARBApsim=carbon, 
-
-                soilTemp=soilTemp, 
-                minSoilTemp=minSoilTemp, 
-                maxSoilTemp=maxSoilTemp, 
+            (heatStorage, 
+             instrumentHeight, 
+             canopyHeight, 
+             minSoilTemp, 
+             maxSoilTemp, 
+             aveSoilTemp, 
+             volSpecHeatSoil, 
+             soilTemp, 
+             morningSoilTemp, 
+             newTemperature, 
+             thermalConductivity, 
+             thermalConductance, 
+             boundaryLayerConductance, 
+             soilWater, 
+             doInitialisationStuff, 
+             maxTempYesterday, 
+             minTempYesterday, 
+             airTemperature, 
+             internalTimeStep, 
+             timeOfDaySecs, 
+             netRadiation, 
+             InitialValues) = apsim_model(
+                weather_MinT=wi.TMIN,
+                weather_MaxT=wi.TMAX,
+                weather_MeanT=wi.T2M,
+                weather_Tav=c.TAV,
+                weather_Amp=c.TAMP,
+                weather_AirPressure=airPressure,
+                weather_Wind=windSpeed,
+                weather_Latitude=c.XLAT,
+                weather_Radn=wi.SRAD,
+                clock_Today_DayOfYear=wi.DATE.dayofyear,
+                microClimate_CanopyHeight=canopyHeight,
+                physical_Thickness=THICK,
+                physical_BD=BD,
+                ps=ps,
+                physical_Rocks=SLROCK,
+                physical_ParticleSizeSand=SLSAND,
+                physical_ParticleSizeSilt=SLSILT,
+                physical_ParticleSizeClay=CLAY,
+                organic_Carbon=SLOC,
+                waterBalance_SW=SW,
+                waterBalance_Eos=wi.EOAD,# Daily Potential Evapotranspiration
+                waterBalance_Eo=wi.EOAD, 
+                waterBalance_Es=ES, # TODO
+                waterBalance_Salb=c.albedo,
+                InitialValues=InitialValues,
+                pInitialValues=None,
+                DepthToConstantTemperature=CONSTANT_TEMPdepth,
+                timestep=timestep,
+                latentHeatOfVapourisation=latentHeatOfVapourisation,
+                stefanBoltzmannConstant=STEFAN_BOLTZMANNconst,
+                airNode=AIRnode,
+                surfaceNode=SURFACEnode,
+                topsoilNode=TOPSOILnode,
+                numPhantomNodes=NUM_PHANTOM_NODES,
+                constantBoundaryLayerConductance=constantBoundaryLayerConductance,
+                numIterationsForBoundaryLayerConductance=numIterationsForBoundaryLayerConductance,
+                defaultTimeOfMaximumTemperature=defaultTimeOfMaximumTemperature,
+                defaultInstrumentHeight=defaultInstrumentHeight,
+                bareSoilRoughness=bareSoilRoughness,
+                doInitialisationStuff=doInitialisationStuff,
+                internalTimeStep=internalTimeStep,
+                timeOfDaySecs=timeOfDaySecs,
+                numNodes=numNodes,
+                numLayers=numLayers,
+                nodeDepth=nodeDepth,
+                thermCondPar1=thermCondPar1,
+                thermCondPar2=thermCondPar2,
+                thermCondPar3=thermCondPar3,
+                thermCondPar4=thermCondPar4,
+                volSpecHeatSoil=volSpecHeatSoil,
+                soilTemp=soilTemp,
+                morningSoilTemp=morningSoilTemp,
+                heatStorage=heatStorage,
+                thermalConductance=thermalConductance,
+                thermalConductivity=thermalConductivity,
+                boundaryLayerConductance=boundaryLayerConductance,
+                newTemperature=newTemperature,
+                airTemperature=airTemperature,
+                maxTempYesterday=maxTempYesterday,
+                minTempYesterday=minTempYesterday,
+                soilWater=soilWater,
+                minSoilTemp=minSoilTemp,
+                maxSoilTemp=maxSoilTemp,
                 aveSoilTemp=aveSoilTemp,
-                morningSoilTemp=morningSoilTemp, 
-                newTemperature=newTemperature, 
-                maxTempYesterday=maxTempYesterday, 
-                minTempYesterday=minTempYesterday, 
-                thermalCondPar1=thermalCondPar1,
-                thermalCondPar2=thermalCondPar2, 
-                thermalCondPar3=thermalCondPar3, 
-                thermalCondPar4=thermalCondPar4, 
-                thermalConductivity=thermalConductivity, 
-                thermalConductance=thermalConductance, 
-                heatStorage=heatStorage, 
-                volSpecHeatSoil=volSpecHeatSoil, 
-                _boundaryLayerConductance=boundaryLayerConductance, 
-                
-                # parameters
-                airPressure=airPressure, 
-                boundaryLayerConductanceSource=boundaryLayerConductanceSource,
-                netRadiationSource=netRadiationSource, windSpeed=windSpeed
-                ) 
-            
+                aveSoilWater=aveSoilWater,
+                thickness=thickness,
+                bulkDensity=bulkDensity,
+                rocks=rocks,
+                carbon=carbon,
+                sand=sand,
+                pom=pom,
+                silt=silt,
+                clay=clay,
+                soilRoughnessHeight=soilRoughnessHeight,
+                instrumentHeight=instrumentHeight,
+                netRadiation=wi.SRAD,
+                canopyHeight=canopyHeight,
+                instrumHeight=instrumHeight,
+                nu=nu,
+                boundarLayerConductanceSource=boundaryLayerConductanceSource,
+                netRadiationSource=netRadiationSource,
+                MissingValue=MissingValue,
+                soilConstituentNames= soilConstituentNames,
+            )
+            # TODO : check the output of apsim_model, it seems to be a tuple with the same values as inputs            
             # Store the outputs
             #date_formattee = wi.DATE.strftime("%Y-%m-%d")
             #Dates.append(wi.DATE.dayofyear); 
