@@ -89,17 +89,17 @@ class APSIM_Campbell(Model):
         soil['SLROCK'] = 0.
 
         if(soilId == "SICL"):
-            sand = 15.0;
-            silt = 35.0;
+            sand = 15.0
+            silt = 35.
         elif (soilId == "SILO"):
-            sand = 30.0;
-            silt = 60.0;
+            sand = 30.0
+            silt = 60.0
         elif (soilId == "SALO"):
-            sand = 60.0;
-            silt = 30.0;
+            sand = 60.0
+            silt = 30.0
         elif (soilId == "SAND"):
-            sand = 85.0;
-            silt = 10.0;
+            sand = 85.0
+            silt = 10.0
 
         soil['SLSAND'] = sand
         soil['SLSILT'] = silt
@@ -111,9 +111,9 @@ class APSIM_Campbell(Model):
             else:
                 return array('f', l.tolist())
 
-        SLLT = to_array(soil.SLLT)
-        SLLB = to_array(soil.SLLB)
-        THICK=to_array(soil.THICK)
+        SLLT = soil.SLLT.tolist()
+        SLLB = soil.SLLB.tolist()
+        THICK=array('f', soil.THICK.to_list())
         BD=to_array(soil.SLBDM)
         SLCARB=to_array(soil.SLOC) 
         CLAY=to_array(soil.SLCLY)
@@ -149,7 +149,7 @@ class APSIM_Campbell(Model):
             physical_ParticleSizeSand=SLSAND,
             physical_ParticleSizeSilt=SLSILT,
             physical_ParticleSizeClay=CLAY,
-            organic_Carbon=SLOC,
+            organic_Carbon=SLCARB,
             waterBalance_SW=SW,
 
             waterBalance_Eos=wi.EOAD,# Daily Potential Evapotranspiration
@@ -180,7 +180,7 @@ class APSIM_Campbell(Model):
             nu=nu,
             boundarLayerConductanceSource=boundaryLayerConductanceSource,
             netRadiationSource=netRadiationSource,
-            MissingValue=MissingValue, #TODO
+            MissingValue=MissingValue, 
             soilConstituentNames= soilConstituentNames,
             )
         """
