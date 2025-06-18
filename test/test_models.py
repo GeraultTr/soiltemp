@@ -7,6 +7,9 @@ def my_config():
     return config
 
 def test_apsim():
+
+    eps = 1e-4
+
     mods = model.Model.models()
     config = my_config()
 
@@ -14,12 +17,19 @@ def test_apsim():
     res = my_model.run(config=config, nb_steps=10)
     assert(len(res) == 110)
 
-def test_campbell():
-    mods = model.Model.models()
-    config = my_config()
+    campbell_res = run_campbell()
 
-    my_model = mods['PyCampbell']()
-    res = my_model.run(config=config, nb_steps=10)
+    dif = res_diff =res-campbell_res
+    assert(dif.SLLB.abs().max() == 0)
+    assert(dif.SLLT.abs().max() == 0)
+    
+    assert(dif.TSLD.abs().max() <= eps)
+    assert(dif.TSLX.abs().max() <= eps)
+    assert(dif.TSLN.abs().max() <= eps)
+
+
+def test_campbell():
+    res = run_campbell()    
     assert(len(res) == 110)
 
 def test_dssat_epic():
@@ -79,3 +89,19 @@ def test_sirius_quality():
     my_model = mods['SiriusQuality']()
     res = my_model.run(config=config, nb_steps=10)
     assert(len(res) == 110)
+
+def run_campbell():
+    mods = model.Model.models()
+    config = my_config()
+
+    my_model = mods['PyCampbell']()
+    res = my_model.run(config=config, nb_steps=10)
+    return res
+
+def run_model(name='APSIM_Campbell'):
+    mods = model.Model.models()
+    config = my_config()
+
+    my_model = mods[name]()
+    res = my_model.run(config=config, nb_steps=10)
+    return res
