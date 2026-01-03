@@ -5,8 +5,8 @@ from math import *
 from typing import *
 from datetime import datetime
 
-from Simplace_Soil_Temperature.snowcovercalculator import model_snowcovercalculator, init_snowcovercalculator
-from Simplace_Soil_Temperature.stmpsimcalculator import model_stmpsimcalculator, init_stmpsimcalculator
+from openalea.Simplace_Soil_Temperature.snowcovercalculator import model_snowcovercalculator, init_snowcovercalculator
+from openalea.Simplace_Soil_Temperature.stmpsimcalculator import model_stmpsimcalculator, init_stmpsimcalculator
 
 #%%CyML Model Begin%%
 def model_soiltemperature(cCarbonContent:float,
@@ -22,8 +22,8 @@ def model_soiltemperature(cCarbonContent:float,
          iCropResidues:float,
          iPotentialSoilEvaporation:float,
          iLeafAreaIndex:float,
-         SoilTempArray:'Array[float]',
-         cSoilLayerDepth:'Array[float]',
+         SoilTempArray:'array[float]',
+         cSoilLayerDepth:'array[float]',
          cFirstDayMeanTemp:float,
          cAverageGroundTemperature:float,
          cAverageBulkDensity:float,
@@ -33,8 +33,8 @@ def model_soiltemperature(cCarbonContent:float,
          SnowWaterContent:float,
          SoilSurfaceTemperature:float,
          AgeOfSnow:int,
-         rSoilTempArrayRate:'Array[float]',
-         pSoilLayerDepth:'Array[float]'):
+         rSoilTempArrayRate:'array[float]',
+         pSoilLayerDepth:'array[float]'):
     """
      - Name: SoilTemperature -Version: 001, -Time step: 1
      - Description:

@@ -403,10 +403,10 @@ class PyCampbell(Model):
     """ APSIM implementation of the Cambell model.
     """
 
-    def run(self, config, nb_steps=0):
+    def run(self, config, nb_steps=0, previous_outputs=None):
 
         c = config
-        soil = c.soil
+        soil = c.soil.copy(deep=True)
         weather = c.weather
         
         # Parameters not in the config
@@ -424,7 +424,7 @@ class PyCampbell(Model):
 
         # Soil parameter
 
-        # soil unit
+        # soil unit NOTE: DANGEROUS
         soil.SLLB *= 0.01
         soil.THICK *= 10
         soil.SVSE *= 10**6
@@ -432,22 +432,22 @@ class PyCampbell(Model):
         soilId = c.soil_id
         soil['SLROCK'] = 0.
 
-        if(soilId == "SICL"):
-            sand = 15.0;
-            silt = 35.0;
-        elif (soilId == "SILO"):
-            sand = 30.0;
-            silt = 60.0;
-        elif (soilId == "SALO"):
-            sand = 60.0;
-            silt = 30.0;
-        elif (soilId == "SAND"):
-            sand = 85.0;
-            silt = 10.0;
+        if (not hasattr(soil, "SLSAND")) or (not hasattr(soil, "SLSILT")):
+            if(soilId == "SICL"):
+                sand = 15.0;
+                silt = 35.0;
+            elif (soilId == "SILO"):
+                sand = 30.0;
+                silt = 60.0;
+            elif (soilId == "SALO"):
+                sand = 60.0;
+                silt = 30.0;
+            elif (soilId == "SAND"):
+                sand = 85.0;
+                silt = 10.0;
 
-        soil['SLSAND'] = sand
-        soil['SLSILT'] = silt
-
+            soil['SLSAND'] = sand
+            soil['SLSILT'] = silt
 
         SLLT = soil.SLLT.tolist()
         SLLB = soil.SLLB.tolist()
@@ -515,7 +515,30 @@ class PyCampbell(Model):
         carbon, rocks, silt, sand, 
         boundaryLayerConductance) = data_init
 
-
+        if previous_outputs is not None:
+            (soilTemp, 
+            minSoilTemp, 
+            maxSoilTemp, 
+            aveSoilTemp,
+            morningSoilTemp, 
+            newTemperature, 
+            maxTempYesterday, 
+            minTempYesterday, 
+            thermalCondPar1, thermalCondPar2, thermalCondPar3, thermalCondPar4, 
+            thermalConductivity, thermalConductance, 
+            heatStorage, 
+            volSpecHeatSoil, 
+            boundaryLayerConductance, 
+            thickness, 
+            depth, 
+            bulkDensity, 
+            # soilWater, 
+            clay,
+            rocks, 
+            # carbon, 
+            sand, 
+            silt
+            ) = previous_outputs
 
         # Outputs
         columns = "Date SLLT SLLB TSLD TSLX TSLN Layer".split()
@@ -623,6 +646,32 @@ class PyCampbell(Model):
                 netRadiationSource=netRadiationSource, windSpeed=windSpeed
                 ) 
             
+            # Not reused, not changing throughout the simulation are commented, or updated by another model
+            raw_outputs = (
+            soilTemp, 
+            minSoilTemp, 
+            maxSoilTemp, 
+            aveSoilTemp,
+            morningSoilTemp, 
+            newTemperature, 
+            maxTempYesterday, 
+            minTempYesterday, 
+            thermalCondPar1, thermalCondPar2, thermalCondPar3, thermalCondPar4, 
+            thermalConductivity, thermalConductance, 
+            heatStorage, 
+            volSpecHeatSoil, 
+            boundaryLayerConductance, 
+            thickness, 
+            depth, 
+            bulkDensity, 
+            # soilWater, 
+            clay,
+            rocks, 
+            # carbon, 
+            sand, 
+            silt
+            )
+            
             # Store the outputs
             #date_formattee = wi.DATE.strftime("%Y-%m-%d")
             #Dates.append(wi.DATE.dayofyear); 
@@ -644,7 +693,8 @@ class PyCampbell(Model):
                 ),
                 columns=columns)
         
-        return df
+        return df, raw_outputs
+    
 #######################################################################################
 # DSSAT EPIC ST
 # TODO Debug : only 3 layers are different

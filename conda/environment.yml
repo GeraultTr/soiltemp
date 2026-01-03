@@ -5,5 +5,7 @@ channels:
 dependencies:
   - python
   - pip
+  - numpy
+  - pandas
   - pip:
       - -e '..[test,dev,doc]'
