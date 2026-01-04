@@ -740,7 +740,7 @@ class PyCampbell(Model):
 
     def daily_config(self, static_config,
                     DATE=pd.to_datetime("1991-07-01"), T2M=10, TMIN=3.2, TMAX=11.1, RAIN=0., SRAD=5.6, DAYLD=8.81, SUNUP=7.59, SUNDN=16.41, EOAD=1.096, ESP=1.096, LE=0, G=0, SNOW=0,
-                    plant_available_water_content=[0.1 for _ in range(10)], LAI=0., albedo=0.11, irrig=0., aboveGroundDM=0.):
+                    plant_available_water=[0.1 for _ in range(10)], LAI=0., albedo=0.11, irrig=0., aboveGroundDM=0.):
         """
         Docstring pour daily_config
         
@@ -759,7 +759,7 @@ class PyCampbell(Model):
         :param LE: Latent heat flux, not used by the Campbell model
         :param G: Ground heat flux, not used by the Campbell model
         :param SNOW: Snow cover TODO mm or i/o?
-        :param plant_available_water_content: Description
+        :param plant_available_water: proportion of field_cap - permanent wilting point (adim)
         :param LAI: Leaf Area Index (adim)
         :param albedo: Albedo (adim)
         :param irrig: Irrigation (mm/day)
@@ -767,7 +767,7 @@ class PyCampbell(Model):
         """
         config_dict = static_config
         config_dict["weather"] = self.weather_line(DATE=DATE, T2M=T2M, TMIN=TMIN, TMAX=TMAX, RAIN=RAIN, SRAD=SRAD, DAYLD=DAYLD, SUNUP=SUNUP, SUNDN=SUNDN, EOAD=EOAD, ESP=ESP, LE=LE, G=G, SNOW=SNOW)
-        config_dict["AWC"] = pd.DataFrame(dict(AWC=plant_available_water_content))["AWC"]
+        config_dict["AWC"] = pd.DataFrame(dict(AWC=plant_available_water))["AWC"]
         config_dict["LAI"] = LAI # adim
         config_dict["albedo"] = albedo # adim
         config_dict["irrig"] = irrig # mm per day
